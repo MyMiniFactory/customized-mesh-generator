@@ -1,0 +1,13 @@
+# vs code
+.vscode/
+
+# Python
+__pycache__/
+.python_history
+
+# env files
+.env
+
+# others
+data/
+models/
