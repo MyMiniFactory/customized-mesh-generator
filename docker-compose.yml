@@ -9,4 +9,4 @@ services:
         GID: $GID
     working_dir: /home/user
     volumes:
-      - /home/user/:$PWD
+      - "$PWD:/home/user/csg"
