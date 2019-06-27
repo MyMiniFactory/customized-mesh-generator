@@ -29,8 +29,8 @@ def union(meshes):
     return union_mesh
 
 
-def load_mesh(path):
-    return trimesh.load_mesh(path)
+def load_mesh(path, file_type = 'stl'):
+    return trimesh.load(path, file_type = file_type)
 
 # def save_mesh(file_name, mesh):
 #     mesh.export(path.join(OUT_DIR, file_name))
