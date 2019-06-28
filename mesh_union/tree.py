@@ -14,7 +14,10 @@ class Node:
 
     @staticmethod
     def from_json(json):
-        return _json_to_tree(json)
+        tree = json['tree']
+        file_mappings = json['file_mappings']
+        
+        return _json_to_tree(tree['root_id'], tree['children'], tree['data'], file_mappings)
     
     def __str__(self):
         children = [str(child) for child in self.children]
@@ -47,34 +50,28 @@ def _flatten(node, parent_matrix, output_list):
         _flatten(child, world_matrix, output_list)
 
 
-def _json_to_tree(json):
-    container_transforms = {}
-    if 'position' in json:
-        container_transforms['translation'] = dict_to_tuple(json['position'])
+def _json_to_tree(current_id, children, data, file_mappings):
+    metadata = data[current_id]
+    file_path = file_mappings[current_id]
 
-    _object = json['object']
+    get_child_node = lambda child_id: _json_to_tree(child_id, children, data, file_mappings)
+    
+    child_nodes = [get_child_node(child_id) for child_id in children[current_id]]
 
-    _id = _object['id']
-    file_path = _object['file_path']
-    metadata = _object['metadata']
-    _children = _object['children']
+    position_within_parent = _get_position_within_parent(metadata)
+    local_transforms = _get_local_transforms(metadata)
 
-    children = [_json_to_tree(child) for child in _object['children']]
-
-    children.append(
-        _create_mesh_node(
-            load_mesh(file_path),
-            metadata
-        )
+    child_nodes.append(
+        _create_mesh_node(file_path, **local_transforms)
     )
 
     return Node(
         mesh = None,
-        matrix = compute_transformation_matrix(**container_transforms),
-        children = children
+        matrix = compute_transformation_matrix(translation = position_within_parent),
+        children = child_nodes
     )
 
-def _create_mesh_node(mesh, metadata):
+def _create_mesh_node(file_path, position, rotation, scale):
     """
     Creates a node from the given position, roration, scale.
 
@@ -82,18 +79,13 @@ def _create_mesh_node(mesh, metadata):
     the pivot point. This means it will be applied before rotation and scale
     """
 
-    container_transforms = {}
-    mesh_transforms = {}
-
-    if 'position' in metadata:
-        mesh_transforms['translation'] = dict_to_tuple(metadata['position'])
-
-    if 'rotation' in metadata:
-        container_transforms['rotation'] = dict_to_tuple(metadata['rotation'])
-
-    if 'scale' in metadata:
-        scale = metadata['scale']
-        container_transforms['scale'] = (scale, scale, scale)
+    container_transforms = {
+        'translation': position
+    }
+    mesh_transforms = {
+        'rotation': rotation,
+        'scale': scale
+    }
     
     # returns the mesh node wrapped in a group node; translation is applied to
     # the mesh node (thus simulating changing the pivot point) and rotation and scale
@@ -103,8 +95,27 @@ def _create_mesh_node(mesh, metadata):
         matrix = compute_transformation_matrix(**container_transforms),
         children = [
             Node(
-                mesh = mesh,
+                mesh = load_mesh(file_path),
                 matrix = compute_transformation_matrix(**mesh_transforms)
             )
         ]
     )
+
+def _get_local_transforms(metadata):
+    local_transforms = {}
+    
+    if 'position' in metadata:
+        local_transforms['position'] = dict_to_tuple(metadata['position'])
+    if 'rotation' in metadata:
+        local_transforms['rotation'] = dict_to_tuple(metadata['rotation'])
+    if 'scale' in metadata:
+        scale = metadata['scale']
+        local_transforms['scale'] = (scale, scale, scale)
+
+    return local_transforms
+
+def _get_position_within_parent(metadata):
+    if 'position_within_parent' in metadata:
+        return dict_to_tuple(metadata['position_within_parent'])
+    else:
+        return (0, 0, 0)
