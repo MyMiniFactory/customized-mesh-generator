@@ -3,7 +3,7 @@ services:
   trimesh:
     build:
       context: ./docker
-      dockerfile: trimesh.Dockerfile
+      dockerfile: pymesh-trimesh.Dockerfile
       args:
         UID: $UID
         GID: $GID
