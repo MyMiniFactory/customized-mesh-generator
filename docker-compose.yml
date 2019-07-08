@@ -2,8 +2,8 @@ version: '2.0'
 services:
   trimesh:
     build:
-      context: ./docker
-      dockerfile: pymesh-trimesh.Dockerfile
+      context: ./
+      dockerfile: Dockerfile
       args:
         UID: $UID
         GID: $GID
