@@ -20,6 +20,7 @@ RUN addgroup --system --gid ${GID} ${GNAME} && \
 USER ${UNAME}
 WORKDIR /home/${UNAME}
 
+# Copy source inside container
+COPY ./ /usr/local/lib/mesh_union/
 
-
-ENTRYPOINT [ "python", "main.py" ]
+ENTRYPOINT [ "python", "/usr/local/lib/mesh_union/main.py" ]
