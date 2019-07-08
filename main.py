@@ -6,10 +6,6 @@ from mesh_union.logger import logger
 from mesh_union.tree import Node
 from mesh_union.utils import union
 
-def _sum(meshes):    
-    head, tail = meshes[0], meshes[1:]
-
-    return sum(tail, head)
 
 if __name__ == '__main__':
     args = sys.argv[1:]
@@ -43,7 +39,6 @@ if __name__ == '__main__':
 
     meshes = tree.flatten()
 
-    # final_mesh = _sum(meshes)
     final_mesh = union(meshes)
 
     # final_mesh.show() # used only for visual debugging
