@@ -14,12 +14,17 @@ def _sum(meshes):
 if __name__ == '__main__':
     args = sys.argv[1:]
 
-    if not args:
-        print('First argument should be a json encoded string or a path to a json file!', end = '\n')
+    if len(args) != 2:
+        print(
+            'First argument should be a json encoded string or a path to a json file.',
+            'Second argument should be the output path.',
+            sep = '\n', end = '\n'
+        )
         sys.exit(1)
 
     # first arg is json file or encoded as string
-    [json_file_or_encoded, *_] = args
+    # second arg is the path to the output file
+    [json_file_or_encoded, output_path] = args
 
     metadata = None
 
@@ -43,6 +48,6 @@ if __name__ == '__main__':
 
     # final_mesh.show() # used only for visual debugging
 
-    # TODO export mesh to output_file
+    final_mesh.export(output_path)
 
     sys.exit(0)
