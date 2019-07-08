@@ -1,13 +1,8 @@
-# vs code
-.vscode/
+# Ignore everything
+**
 
-# Python
-__pycache__/
-.python_history
-
-# env files
-.env
-
-# others
-data/
-models/
+# include source though
+!main.py
+!definitions.py
+!mesh_union/
+# !**/*.py
