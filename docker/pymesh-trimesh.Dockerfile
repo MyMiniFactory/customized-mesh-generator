@@ -19,4 +19,4 @@ RUN addgroup --system --gid $GID $GNAME && \
 USER user
 WORKDIR /home/user
 
-ENTRYPOINT [ "python" ]
+ENTRYPOINT [ "python", "main.py" ]
