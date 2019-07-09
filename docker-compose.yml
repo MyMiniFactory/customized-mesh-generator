@@ -1,12 +1,20 @@
 version: '2.0'
 services:
-  trimesh:
+  pymesh-trimesh:
     build:
       context: ./
       dockerfile: Dockerfile
       args:
         UID: $UID
         GID: $GID
-    working_dir: /home/user
     volumes:
-      - "$PWD:/home/user/csg"
+      - "./examples/input.json:/tmp/input.json:ro" # for json input
+      - "./examples/out.stl:/tmp/out.stl" # for output. needs to exist on host!
+
+      # files
+      - "./models/Feature_bodyA.stl:/tmp/files/111:ro"
+      - "./models/Feature_headA.stl:/tmp/files/222:ro"
+      - "./models/Item_head_truckerCap.stl:/tmp/files/333:ro"
+    command: /tmp/input.json /tmp/out.stl
+
+    # entrypoint: sh # to inspect container
