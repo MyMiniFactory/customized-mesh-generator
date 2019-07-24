@@ -80,11 +80,11 @@ def _create_mesh_node(file_path, position, rotation, scale):
     """
 
     container_transforms = {
-        'translation': position
-    }
-    mesh_transforms = {
         'rotation': rotation,
         'scale': scale
+    }
+    mesh_transforms = {
+        'translation': position
     }
     
     # returns the mesh node wrapped in a group node; translation is applied to
