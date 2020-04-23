@@ -1,7 +1,9 @@
 import time
+import io
 import trimesh
 import pymesh
 from mesh_union.logger import logger
+from mesh_union.minio_client import get_customizer_object
 
 def dict_to_tuple(_dict):
     return (_dict['x'], _dict['y'], _dict['z'])
@@ -17,7 +19,7 @@ def union(meshes):
 
     total_time = end_time - start_time
 
-    logger.debug("Union of {} files. Time taken: {:6.2f}".format(len(meshes), total_time))
+    logger.info("Union of {} files. Time taken: {:6.2f}".format(len(meshes), total_time))
 
     return pymesh_to_trimesh(union_mesh)
 
@@ -32,7 +34,5 @@ def pymesh_to_trimesh(pymesh_mesh):
 
 
 def load_mesh(path, file_type = 'stl'):
-    return trimesh.load(path, file_type = file_type)
-
-# def save_mesh(file_name, mesh):
-#     mesh.export(path.join(OUT_DIR, file_name))
+    obj = get_customizer_object(path)
+    return trimesh.load_mesh(io.BytesIO(obj.read()), file_type=file_type)

@@ -1,0 +1,5 @@
+pika==1.1.0
+minio==5.0.8
+trimesh==3.6.33
+Shapely==1.7.0
+requests==2.23.0
