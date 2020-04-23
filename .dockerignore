@@ -2,7 +2,7 @@
 **
 
 # include source though
-!main.py
-!definitions.py
+!consume.py
 !mesh_union/
+!requirements.txt
 # !**/*.py
