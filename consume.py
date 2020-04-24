@@ -15,6 +15,8 @@ from mesh_union.definitions import (
     RABBITMQ_USER,
     RABBITMQ_PASSWORD,
     RABBITMQ_CUSTOMIZER_QUEUE,
+    RABBITMQ_CONNECTION_HEARBEAT,
+    RABBITMQ_QUEUE_PREFETCH_COUNT,
     MMF_SECRET,
 )
 
@@ -23,6 +25,7 @@ from mesh_union.definitions import (
 connection = pika.BlockingConnection(pika.ConnectionParameters(
     host=RABBITMQ_HOST,
     port=RABBITMQ_PORT,
+    heartbeat=RABBITMQ_CONNECTION_HEARBEAT,
     credentials=pika.credentials.PlainCredentials(username=RABBITMQ_USER, password=RABBITMQ_PASSWORD)
 ))
 
@@ -92,7 +95,7 @@ def callback(
         requeue = generated_successfully and (not uploaded_successfully or not patched_successfully)
         ch.basic_nack(delivery_tag=method.delivery_tag, requeue=requeue)
 
-channel.basic_qos(prefetch_count=5)
+channel.basic_qos(prefetch_count=RABBITMQ_QUEUE_PREFETCH_COUNT)
 channel.basic_consume(
     queue=RABBITMQ_CUSTOMIZER_QUEUE,
     on_message_callback=callback
