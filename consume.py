@@ -21,19 +21,6 @@ from mesh_union.definitions import (
 )
 
 
-
-connection = pika.BlockingConnection(pika.ConnectionParameters(
-    host=RABBITMQ_HOST,
-    port=RABBITMQ_PORT,
-    heartbeat=RABBITMQ_CONNECTION_HEARBEAT,
-    credentials=pika.credentials.PlainCredentials(username=RABBITMQ_USER, password=RABBITMQ_PASSWORD)
-))
-
-channel = connection.channel()
-
-channel.queue_declare(queue=RABBITMQ_CUSTOMIZER_QUEUE, durable=True)
-
-
 def callback(
     ch: pika.adapters.blocking_connection.BlockingChannel,
     method: pika.spec.Basic.Deliver,
@@ -95,12 +82,33 @@ def callback(
         requeue = generated_successfully and (not uploaded_successfully or not patched_successfully)
         ch.basic_nack(delivery_tag=method.delivery_tag, requeue=requeue)
 
+
+# TODO run callback in another thread
+# example: https://github.com/pika/pika/blob/1.0.1/examples/basic_consumer_threaded.py
+
+connection = pika.BlockingConnection(pika.ConnectionParameters(
+    host=RABBITMQ_HOST,
+    port=RABBITMQ_PORT,
+    heartbeat=RABBITMQ_CONNECTION_HEARBEAT,
+    credentials=pika.credentials.PlainCredentials(username=RABBITMQ_USER, password=RABBITMQ_PASSWORD)
+))
+
+channel = connection.channel()
+
+channel.queue_declare(queue=RABBITMQ_CUSTOMIZER_QUEUE, durable=True)
 channel.basic_qos(prefetch_count=RABBITMQ_QUEUE_PREFETCH_COUNT)
 channel.basic_consume(
     queue=RABBITMQ_CUSTOMIZER_QUEUE,
     on_message_callback=callback
 )
 
-logger.info(' [*] Waiting for messages. To exit press CTRL+C')
-channel.start_consuming()
+try:
+    logger.info(' [*] Waiting for messages. To exit press CTRL+C')
+    channel.start_consuming()
+except KeyboardInterrupt:
+    channel.stop_consuming()
+except Exception as e:
+    logger.error(e)
 
+if connection.is_open:
+    connection.close()
