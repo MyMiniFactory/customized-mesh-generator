@@ -54,9 +54,11 @@ def _json_to_tree(current_id, children, data, file_mappings):
     metadata = data[current_id]
     file_path = file_mappings[current_id]
 
-    get_child_node = lambda child_id: _json_to_tree(child_id, children, data, file_mappings)
-    
-    child_nodes = [get_child_node(child_id) for child_id in children[current_id]]
+    child_nodes = [
+        _json_to_tree(child_id, children, data, file_mappings)
+        for child_id
+        in children[current_id]
+    ]
 
     position_within_parent = _get_position_within_parent(metadata)
     local_transforms = _get_local_transforms(metadata)
