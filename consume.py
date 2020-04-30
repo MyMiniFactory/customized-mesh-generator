@@ -4,6 +4,12 @@ import os
 import pika
 import requests
 
+import time
+import gc
+# gc.enable()
+# gc.set_debug(gc.DEBUG_LEAK)
+
+
 from mesh_union.logger import logger
 from mesh_union.tree import Node
 from mesh_union.utils import union
@@ -19,6 +25,22 @@ from mesh_union.definitions import (
     RABBITMQ_QUEUE_PREFETCH_COUNT,
     MMF_SECRET,
 )
+
+
+def dump_garbage():
+    """
+    show us what's the garbage about
+    """
+        
+    # force collection
+    print("\nGARBAGE:")
+    gc.collect()
+
+    print("\nGARBAGE OBJECTS:")
+    for x in gc.garbage:
+        s = str(x)
+        if len(s) > 80: s = s[:80]
+        print(type(x),"\n  ", s)
 
 
 def callback(
@@ -55,6 +77,10 @@ def callback(
         final_mesh = union(meshes)
         generated_successfully = True
         logger.info('Mesh generated successfully')
+
+        for m in meshes:
+            m._cache.clear()
+
     except Exception as e:
         logger.error(e)
 
@@ -81,6 +107,9 @@ def callback(
     else:
         requeue = generated_successfully and (not uploaded_successfully or not patched_successfully)
         ch.basic_nack(delivery_tag=method.delivery_tag, requeue=requeue)
+    
+    gc.collect()
+    
 
 
 # TODO run callback in another thread
