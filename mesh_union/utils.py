@@ -3,7 +3,6 @@ import io
 import trimesh
 import pymesh
 from mesh_union.logger import logger
-from mesh_union.minio_client import get_customizer_object
 
 def dict_to_tuple(_dict):
     return (_dict['x'], _dict['y'], _dict['z'])
@@ -34,5 +33,4 @@ def pymesh_to_trimesh(pymesh_mesh):
 
 
 def load_mesh(path, file_type = 'stl'):
-    obj = get_customizer_object(path)
-    return trimesh.load_mesh(io.BytesIO(obj.read()), file_type=file_type)
+    return trimesh.load_mesh(path, file_type=file_type)
