@@ -20,8 +20,6 @@ if len(args) != 2:
 [metadataFileName, outputFileName] = args
 
 
-print(metadataFileName)
-
 metadata = None
 with open(metadataFileName, 'r') as f:
     metadata = json.load(f)
