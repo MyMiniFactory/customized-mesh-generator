@@ -100,8 +100,9 @@ def callback(
                 put_customizer_object(output_object_key, f.read())
                 logger.info('Mesh uploaded successfully. output path: %s' % output_object_key)
                 uploaded_successfully = True
-        except:
+        except Exception as e:
             logger.error('There was a problem uploading the file')
+            logger.error(e)
 
     try:
         r = patch_customized_mesh(callback_url, success=generated_successfully)
