@@ -104,13 +104,14 @@ def callback(
             logger.error('There was a problem uploading the file')
             logger.error(e)
 
-    try:
-        r = patch_customized_mesh(callback_url, success=generated_successfully)
-        if r.status_code == 200:
-            patched_successfully = True
-            logger.info('Mesh patched successfully as %s' % 'successful' if generated_successfully else 'failed')
-    except Exception as e:
-        logger.error(e)
+    if uploaded_successfully:
+        try:
+            r = patch_customized_mesh(callback_url, success=generated_successfully)
+            if r.status_code == 200:
+                patched_successfully = True
+                logger.info('Mesh patched successfully as %s' % 'successful' if generated_successfully else 'failed')
+        except Exception as e:
+            logger.error(e)
 
     if generated_successfully and uploaded_successfully and patched_successfully:
         ch.basic_ack(delivery_tag=method.delivery_tag)
