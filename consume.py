@@ -9,6 +9,7 @@ import sys
 import pathlib
 import shutil
 import subprocess
+import ssl
 
 
 from mesh_union.logger import logger
@@ -131,7 +132,8 @@ connection = pika.BlockingConnection(pika.ConnectionParameters(
     host=RABBITMQ_HOST,
     port=RABBITMQ_PORT,
     heartbeat=RABBITMQ_CONNECTION_HEARBEAT,
-    credentials=pika.credentials.PlainCredentials(username=RABBITMQ_USER, password=RABBITMQ_PASSWORD)
+    credentials=pika.credentials.PlainCredentials(username=RABBITMQ_USER, password=RABBITMQ_PASSWORD),
+    ssl_options=pika.SSLOptions(ssl.SSLContext(ssl.PROTOCOL_TLSv1))
 ))
 
 channel = connection.channel()
